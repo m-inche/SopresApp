@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SorpresApp - Cloud App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass-card { background: rgba(15, 23, 42, 0.90); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .animate-fade-in { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-full flex flex-col justify-between font-sans selection:bg-indigo-500 selection:text-white">
+
+    <header class="glass-card sticky top-0 z-40 border-b border-slate-800/80 py-3.5 px-4 sm:px-8 shadow-xl">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-rose-500 flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-gift text-white text-sm"></i>
+                </div>
+                <div>
+                    <span class="font-black text-lg tracking-tight text-white block leading-tight">Sorpres<span class="text-indigo-400">App</span></span>
+                    <span class="text-[10px] text-slate-400 font-medium uppercase">Play & Match</span>
+                </div>
+            </div>
+            <div id="badge-code" class="hidden text-xs text-indigo-300 font-mono bg-indigo-950/50 px-3 py-1.5 rounded-xl border border-indigo-500/30"></div>
+        </div>
+    </header>
+
+    <main class="max-w-xl w-full mx-auto p-4 sm:p-6 my-auto">
+        
+        <!-- VISTA INICIO -->
+        <section id="view-home" class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl animate-fade-in text-center">
+            <div class="w-16 h-16 bg-indigo-600/20 text-indigo-400 rounded-3xl flex items-center justify-center mx-auto mb-4 text-2xl border border-indigo-500/30">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <h2 class="text-2xl font-black text-white mb-1">¡Crea o Únete al Reto!</h2>
+            <p class="text-xs text-slate-400 mb-6">Elige tu rol y vive la magia del intercambio.</p>
+
+            <div class="space-y-4 text-left">
+                <!-- Crear Evento -->
+                <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-2"><i class="fa-solid fa-crown mr-1"></i> Modo Coordinador</h3>
+                    <input type="text" id="home-event-name" placeholder="Nombre del Evento (Ej. Navidad)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 mb-2">
+                    <input type="password" id="home-coord-pass" placeholder="Clave de administración" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 mb-2.5">
+                    <button onclick="crearEvento()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-xl text-xs transition shadow-lg">Crear Sala 🚀</button>
+                </div>
+
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-slate-800"></div>
+                    <span class="flex-shrink mx-4 text-slate-500 text-[10px] uppercase font-bold">O</span>
+                    <div class="flex-grow border-t border-slate-800"></div>
+                </div>
+
+                <!-- Unirse con Código -->
+                <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-2"><i class="fa-solid fa-user-group mr-1"></i> Modo Participante</h3>
+                    <input type="text" id="home-join-code" placeholder="Pega tu Código de Sala (Ej. EVT-XYZ)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 mb-2.5 font-mono uppercase">
+                    <button onclick="unirseEvento()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 rounded-xl text-xs transition border border-slate-700">Entrar a la Sala 🔑</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA INSCRIPCIÓN -->
+        <section id="view-registration" class="glass-card rounded-3xl p-5 sm:p-8 shadow-2xl hidden animate-fade-in">
+            <div class="text-center mb-6">
+                <span class="text-[10px] uppercase tracking-widest text-emerald-400 font-bold block mb-1">● Sala Activa</span>
+                <h2 class="text-2xl font-black text-white" id="reg-title">Cargando...</h2>
+            </div>
+
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 mb-4 space-y-3">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-400">Apúntate al Sorteo</h3>
+                <input type="text" id="reg-name" placeholder="Tu Nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                <input type="text" id="reg-wish" placeholder="¿Qué te gustaría recibir?" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                <input type="password" id="reg-pass" placeholder="Tu Clave Secreta" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                <button onclick="registrarParticipante()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-xl text-xs transition shadow-md">¡Listo, Inscríbeme! ✨</button>
+            </div>
+
+            <div class="mb-4">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">Conectados (<span id="count-part">0</span>)</span>
+                <div id="list-part" class="space-y-2 max-h-32 overflow-y-auto pr-1"></div>
+            </div>
+
+            <!-- PANEL COORDINADOR -->
+            <div id="coord-panel" class="border-t border-slate-800 pt-4 hidden space-y-3">
+                <div class="bg-indigo-950/30 border border-indigo-500/30 rounded-2xl p-4 text-center">
+                    <span class="text-xs text-indigo-300 font-bold block mb-1"><i class="fa-solid fa-shield-halved mr-1"></i> Panel de Control</span>
+                    <p class="text-[11px] text-slate-400 mb-3">Código de Sala: <strong id="code-txt" class="text-white select-all bg-slate-900 px-2 py-1 rounded"></strong></p>
+                    
+                    <div class="space-y-2">
+                        <button onclick="lanzarSorteo()" class="w-full bg-gradient-to-r from-indigo-600 to-rose-600 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg">🎲 ¡Lanzar Sorteo Ya!</button>
+                        <button onclick="eliminarEvento()" class="w-full bg-rose-950/50 hover:bg-rose-900 text-rose-300 border border-rose-800 font-semibold py-2 rounded-xl text-[11px] transition">🗑️ Cerrar y Borrar Sala</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-3"><button onclick="salir()" class="text-[11px] text-slate-500 hover:text-slate-300">Cambiar Sala</button></div>
+        </section>
+
+        <!-- VISTA LOGIN -->
+        <section id="view-login" class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl hidden animate-fade-in text-center">
+            <div class="w-14 h-14 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl border border-indigo-500/30">
+                <i class="fa-solid fa-key"></i>
+            </div>
+            <h2 class="text-2xl font-black text-white mb-1">¡Sorteo Realizado!</h2>
+            <p class="text-xs text-slate-400 mb-6">Identifícate para ver tu misión.</p>
+
+            <div class="space-y-3 text-left mb-6">
+                <select id="login-select" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-3 text-sm text-white focus:outline-none focus:border-indigo-500"></select>
+                <input type="password" id="login-pass" placeholder="Tu Clave Secreta" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-3 text-sm text-white focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <button onclick="loginParticipante()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg mb-3">Descubrir Mi Destinatario 🎁</button>
+            
+            <div id="coord-login-shortcut" class="mt-4 pt-4 border-t border-slate-800 hidden">
+                <button onclick="abrirAdminPanel()" class="text-xs text-indigo-400 hover:underline"><i class="fa-solid fa-gear mr-1"></i> Opciones de Coordinador</button>
+            </div>
+            <div class="text-center mt-3"><button onclick="salir()" class="text-[11px] text-slate-500 hover:text-slate-300">Salir</button></div>
+        </section>
+
+        <!-- VISTA DASHBOARD -->
+        <section id="view-dashboard" class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl hidden animate-fade-in text-center">
+            <div class="w-16 h-16 bg-gradient-to-tr from-indigo-600 to-rose-500 text-white rounded-3xl flex items-center justify-center mx-auto mb-4 text-2xl shadow-xl">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+            <span class="text-xs font-bold uppercase tracking-widest text-indigo-400 block mb-1" id="dash-event">Misión Activa</span>
+            <h2 class="text-2xl font-black text-white mb-1" id="dash-greeting">Hola</h2>
+            
+            <div class="bg-slate-900/90 border border-indigo-500/40 rounded-2xl p-5 mb-5 shadow-inner text-left">
+                <span class="text-xs text-indigo-300 font-semibold uppercase tracking-wider block mb-1">Te toca regalar a:</span>
+                <p class="text-2xl font-black text-white tracking-tight mb-3" id="dash-target">???</p>
+                
+                <div class="border-t border-slate-800 pt-3">
+                    <span class="text-[11px] text-slate-400 block font-medium mb-1">💡 Deseos de tu objetivo:</span>
+                    <p id="dash-target-wish" class="text-xs text-indigo-200 italic font-medium bg-slate-950 p-3 rounded-xl border border-slate-800">Cargando...</p>
+                </div>
+            </div>
+
+            <!-- Modificar deseos -->
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 mb-6 text-left">
+                <span class="text-xs font-bold text-slate-300 block mb-1"><i class="fa-solid fa-pen-to-square mr-1 text-indigo-400"></i> Tus deseos (Quedan <span id="intentos-txt">3</span> cambios):</span>
+                <div class="flex gap-2 mt-2">
+                    <input type="text" id="edit-wish" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                    <button onclick="guardarDeseo()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition shrink-0">Actualizar</button>
+                </div>
+            </div>
+
+            <button onclick="salir()" class="text-xs text-slate-400 hover:text-white">Cerrar Sesión</button>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-4 text-xs text-slate-500 border-t border-slate-900">SorpresApp • ¡Diviértete!</footer>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/TU_SCRIPT_ID/exec";
+
+        let currentCode = localStorage.getItem('app_code') || null;
+        let eventData = null;
+        let loggedUserKey = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (currentCode) unirseEvento(currentCode);
+            else mostrar('view-home');
+        });
+
+        function mostrar(id) {
+            ['view-home', 'view-registration', 'view-login', 'view-dashboard'].forEach(v => document.getElementById(v).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        async function apiCall(payload) {
+            try {
+                let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                return await res.json();
+            } catch(e) {
+                alert('Error de conexión.');
+                return { success: false };
+            }
+        }
+
+        async function crearEvento() {
+            let name = document.getElementById('home-event-name').value.trim();
+            let pass = document.getElementById('home-coord-pass').value.trim();
+            if (!name || !pass) return alert('Completa los campos');
+            
+            let res = await apiCall({ action: 'createEvent', eventName: name, coordPass: pass });
+            if (res.success) {
+                currentCode = res.code;
+                localStorage.setItem('app_code', currentCode);
+                localStorage.setItem('coord_token_' + currentCode, pass);
+                unirseEvento(currentCode);
+            } else {
+                alert(res.message);
+            }
+        }
+
+        async function unirseEvento(codeOverride) {
+            let code = codeOverride || document.getElementById('home-join-code').value.trim().toUpperCase();
+            if (!code) return alert('Ingresa un código');
+
+            let res = await apiCall({ action: 'getEvent', code: code });
+            if (!res.success) return alert(res.message || 'Código no encontrado');
+
+            currentCode = code;
+            localStorage.setItem('app_code', currentCode);
+            eventData = res;
+
+            document.getElementById('badge-code').innerText = `Sala: ${code}`;
+            document.getElementById('badge-code').classList.remove('hidden');
+
+            let savedCoordPass = localStorage.getItem('coord_token_' + code);
+            let soyCoordinador = savedCoordPass && savedCoordPass === res.coordPass;
+
+            if (res.estado === "inscripcion") {
+                mostrar('view-registration');
+                document.getElementById('reg-title').innerText = res.eventName;
+                document.getElementById('code-txt').innerText = code;
+                
+                if (soyCoordinador) document.getElementById('coord-panel').classList.remove('hidden');
+                renderListaParticipantes(res.participantes);
+            } else {
+                mostrar('view-login');
+                renderLoginSelect(res.participantes);
+                if (soyCoordinador) document.getElementById('coord-login-shortcut').classList.remove('hidden');
+            }
+        }
+
+        function renderListaParticipantes(parts) {
+            let list = document.getElementById('list-part');
+            list.innerHTML = '';
+            let keys = Object.keys(parts);
+            document.getElementById('count-part').innerText = keys.length;
+            if (keys.length === 0) {
+                list.innerHTML = '<p class="text-xs text-slate-500 italic text-center py-2">Nadie inscrito aún</p>';
+                return;
+            }
+            keys.forEach(k => {
+                list.innerHTML += `<div class="bg-slate-950/80 border border-slate-800 px-3.5 py-2.5 rounded-xl flex justify-between text-xs items-center"><span class="font-semibold text-white">${parts[k].nombre}</span><span class="text-indigo-300 italic">💡 ${parts[k].deseo}</span></div>`;
+            });
+        }
+
+        async function registrarParticipante() {
+            let nombre = document.getElementById('reg-name').value.trim();
+            let deseo = document.getElementById('reg-wish').value.trim();
+            let password = document.getElementById('reg-pass').value.trim();
+            if (!nombre || !password) return alert('Completa los campos obligatorios');
+
+            let res = await apiCall({ action: 'registerParticipant', code: currentCode, nombre, deseo, password });
+            if (res.success) {
+                alert('¡Inscrito con éxito!');
+                document.getElementById('reg-name').value = '';
+                document.getElementById('reg-wish').value = '';
+                document.getElementById('reg-pass').value = '';
+                unirseEvento(currentCode);
+            } else {
+                alert(res.message);
+            }
+        }
+
+        async function lanzarSorteo() {
+            let pass = prompt("Clave de coordinador:");
+            let res = await apiCall({ action: 'executeDraw', code: currentCode, coordPass: pass });
+            if (res.success) {
+                alert('¡Sorteo listo!');
+                unirseEvento(currentCode);
+            } else {
+                alert(res.message);
+            }
+        }
+
+        async function eliminarEvento() {
+            let pass = prompt("Clave de coordinador para borrar la sala:");
+            if (!pass) return;
+
+            let res = await apiCall({ action: 'deleteEvent', code: currentCode, coordPass: pass });
+            if (res.success) {
+                alert('Sala eliminada.');
+                salir();
+            } else {
+                alert(res.message);
+            }
+        }
+
+        function renderLoginSelect(parts) {
+            let sel = document.getElementById('login-select');
+            sel.innerHTML = '<option value="">Selecciona tu nombre...</option>';
+            Object.keys(parts).forEach(k => {
+                sel.innerHTML += `<option value="${k}">${parts[k].nombre}</option>`;
+            });
+        }
+
+        function loginParticipante() {
+            let key = document.getElementById('login-select').value;
+            let pass = document.getElementById('login-pass').value.trim();
+            if (!key || !pass) return alert('Elige tu nombre y clave');
+
+            let p = eventData.participantes[key];
+            if (p.password !== pass) return alert('Clave incorrecta');
+
+            loggedUserKey = key;
+            mostrarDashboard(p);
+        }
+
+        function abrirAdminPanel() {
+            let pass = prompt("Clave de coordinador:");
+            let savedCoordPass = localStorage.getItem('coord_token_' + currentCode);
+            if (pass === savedCoordPass || pass === eventData.coordPass) {
+                if(confirm("¿Eliminar sala por completo?")) eliminarEvento();
+            } else {
+                alert("Clave incorrecta");
+            }
+        }
+
+        function mostrarDashboard(p) {
+            mostrar('view-dashboard');
+            document.getElementById('dash-event').innerText = eventData.eventName;
+            document.getElementById('dash-greeting').innerText = `¡Hola, ${p.nombre}!`;
+            document.getElementById('dash-target').innerText = p.asignadoA;
+            document.getElementById('edit-wish').value = p.deseo;
+            
+            // Calculamos intentos restantes (máximo 3)
+            let intentosRestantes = Math.max(0, 3 - (p.intentos || 0));
+            document.getElementById('intentos-txt').innerText = intentosRestantes;
+
+            let targetObj = Object.values(eventData.participantes).find(x => x.nombre === p.asignadoA);
+            if (targetObj) document.getElementById('dash-target-wish').innerText = targetObj.deseo;
+        }
+
+        async function guardarDeseo() {
+            let nuevoDeseo = document.getElementById('edit-wish').value.trim();
+            let p = eventData.participantes[loggedUserKey];
+
+            let res = await apiCall({ action: 'updateWish', code: currentCode, nombre: p.nombre, nuevoDeseo });
+            if (res.success) {
+                alert('¡Deseo actualizado!');
+                unirseEvento(currentCode);
+            } else {
+                alert(res.message);
+            }
+        }
+
+        function salir() {
+            localStorage.removeItem('app_code');
+            currentCode = null;
+            loggedUserKey = null;
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
